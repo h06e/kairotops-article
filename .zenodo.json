@@ -1,0 +1,28 @@
+{
+  "title": "kairotops-article: scripts and data of the article \"Kairotops as opportune designs of disordered materials\"",
+  "upload_type": "software",
+  "description": "Scripts reproducing the numerical studies of the article \"Kairotops as opportune designs of disordered materials\" (R. Valmalette, C. Bellis, submitted to npj Computational Materials), with the microstructures of the stiffness benchmark (S1: 144 binary 256^3 microstructures in HDF5, with their properties and generation parameters). Generation and homogenization rely on Kairotop.jl v0.2.0.",
+  "creators": [
+    {
+      "name": "Valmalette, Robin",
+      "orcid": "0009-0005-3626-0386",
+      "affiliation": "Laboratoire de Mécanique et d'Acoustique, CNRS"
+    }
+  ],
+  "license": "bsd-3-clause",
+  "keywords": [
+    "disordered materials",
+    "microstructure generation",
+    "topology optimization",
+    "FFT homogenization",
+    "architected materials"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/h06e/Kairotop.jl",
+      "relation": "requires",
+      "scheme": "url"
+    }
+  ],
+  "access_right": "open"
+}

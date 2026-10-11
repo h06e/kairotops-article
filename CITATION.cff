@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: >-
+  If you use these scripts or data, please cite the article they accompany
+  (see "preferred-citation") and this archive.
+title: "kairotops-article: scripts and data of the article 'Kairotops as opportune designs of disordered materials'"
+abstract: >-
+  Scripts reproducing the numerical studies of the article (stiffness benchmark across solid fractions,
+  morphological control, anisotropic objectives, robustness to defects, detailed optimization example,
+  printed-beam analysis, initialization length and density filter radius), with the microstructures of
+  the stiffness benchmark (S1). Generation and homogenization rely on Kairotop.jl v0.2.0.
+authors:
+  - given-names: Robin
+    family-names: Valmalette
+    orcid: "https://orcid.org/0009-0005-3626-0386"
+    affiliation: "Laboratoire de Mécanique et d'Acoustique, CNRS"
+    email: valmalette@lma.cnrs-mrs.fr
+repository-code: "https://github.com/h06e/kairotops-article"
+license: BSD-3-Clause
+version: "1.0.0"
+date-released: "2026-10-11"
+references:
+  - type: software
+    title: "Kairotop.jl"
+    version: "0.2.0"
+    authors:
+      - given-names: Robin
+        family-names: Valmalette
+    repository-code: "https://github.com/h06e/Kairotop.jl"
+preferred-citation:
+  type: article
+  title: "Kairotops as opportune designs of disordered materials"
+  authors:
+    - given-names: Robin
+      family-names: Valmalette
+    - given-names: Cédric
+      family-names: Bellis
+  journal: "npj Computational Materials (submitted)"
+  year: 2026

@@ -1,0 +1,47 @@
+# S8 -- O-Kai at f = 0.2: effect of the initialization length l0 and of the density-filter radius r_f (OQ-53).
+# Robin, 2026-10-07: "investigate the effect of the l_0 and rf in the generation of the okai at 20% solid fraction.
+# I want to cover each parameter from 0.005 to 0.03 (0.005, 0.0075, 0.01, 0.02, 0.03). One seed for all. In the report,
+# make a figure with all the renders with l0 in x axis and rf in y axis. Make a similar figure with the stiffness
+# properties."
+#
+# Full 5 x 5 grid, seed 1. Everything else is the S1 O-Kai recipe at f = 0.2 (configs/S1.toml [prod.kai_base] +
+# [prod.okai.f20]: weight_D = 1, init_contrast 0.5, beta 16 -> 64 every 20 iterations, w_Bin 0.5, maxiter 300,
+# tolerance 1e-3; method in force, contrast 1000, N = 256). The point (l0, r_f) = (0.03, 0.005) is the S1 recipe
+# itself: it must reproduce results/S1 132d99fac460 (O-Kai f = 0.2 seed 1) -- check.
+# Unit cell = 1; at N = 256 one voxel is 0.0039, so r_f = 0.005 is about 1.3 voxels.
+
+study_id = "S8"
+
+[prod]
+N = 256
+phase_contrast = 1000
+family = "O-Kai"
+fraction = 0.2
+seed = 1
+l0_values = [0.005, 0.0075, 0.01, 0.02, 0.03]
+rf_values = [0.005, 0.0075, 0.01, 0.02, 0.03]
+recipe = "S1.okai.f20"           # base parameters: configs/S1.toml [prod.kai_base] + [prod.okai.f20]
+
+# C-Kai extension (OQ-55). Robin, 2026-10-08: "In S8, repeat the process with the CKai at 10, 20, and 30%. I'll decide
+# to update the parameters l0 and rf myself." Same 5 x 5 grid and seed; base parameters = the S1 C-Kai recipe at each
+# fraction (configs/S1.toml [prod.kai_base] + [prod.ckai.fXX]: weight_D = 0, init_contrast 0.5, beta 16 -> 64,
+# w_Bin 0.5). The S1 recipe point of each fraction, (l0, r_f) = (0.02, 0.005) at 0.1 and 0.2, (0.03, 0.005) at 0.3,
+# must reproduce the S1 C-Kai seed-1 run in force (check). Script: scripts/S8_l0_rf.jl l0 rf --family C-Kai --fraction f.
+[prod.ckai]
+fractions = [0.1, 0.2, 0.3]
+
+# smoke test of the chain (generation, storage, notebook, report): N = 64, 2 x 2 grid, few iterations; stored under
+# S8_smoke as dev runs. At N = 64 one voxel is 0.016: the values are not meaningful.
+[dev]
+N = 64
+phase_contrast = 1000
+family = "O-Kai"
+fraction = 0.2
+seed = 1
+l0_values = [0.02, 0.03]
+rf_values = [0.01, 0.02]
+recipe = "S1.okai.f20"
+maxiter = 40
+
+[dev.ckai]
+fractions = [0.1, 0.2, 0.3]

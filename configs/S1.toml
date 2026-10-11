@@ -1,0 +1,260 @@
+# S1 -- stiffness benchmark across solid fractions, contrast 1000 (OQ-29),
+# corrected gradient (OQ-26), revised algorithm (docs/algorithm/ckai_algorithm.pdf).
+# Robin, 2026-09-27: f = 0.1 ... 0.9; Gyroid + 5 RSA seeds per fraction;
+# C-Kai and O-Kai tuned per fraction (study S1p, seed 1), then 5 seeds each,
+# all kairotops at approximately the same internal length (r_cov ~ 0.07).
+#
+# RSA protocol: spherical voids in a solid matrix, r_min = min_distance =
+# 0.015 (the SI's 0.15 is infeasible, OQ-20), shrink factor 0.9, 1e6 attempts.
+# r_max per fraction ([prod.rsa_max_radius]): the smallest value of the ladder
+# 0.05..0.45 for which seed 1 reaches the target (scripts/S1_rsa_radius_search.jl,
+# OQ-32); a fixed r_max = 0.45 overshoots at f >= 0.4 (one sphere alone removes
+# 38% of the cell). f = 0.1/0.2 are infeasible at any r_max (packing stalls at
+# f ~ 0.25) and keep r_max = 0.45 (the best achieved). A run whose achieved solid
+# fraction misses the target by more than 1e-3 is stored with failed = true
+# (expected at f = 0.1/0.2), never skipped.
+#
+# Kairotop parameters: [prod.kai_base] holds the shared values (the C-Kai
+# recipe of OQ-27 at contrast 1000); [prod.ckai.fXX] / [prod.okai.fXX] hold the
+# per-fraction choices made from the S1p tuning (see the header comment of
+# each table for the tuning run it came from).
+
+study_id = "S1"
+
+[prod]
+N = 256
+phase_contrast = 1000
+fractions = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+rsa_seeds = [1, 2, 3, 4, 5]
+kai_seeds = [1, 2, 3, 4, 5]
+rsa_min_radius = 0.015
+rsa_min_distance = 0.015
+rsa_shrink_factor = 0.9
+rsa_max_attempts = 1000000
+rsa_deviation_tolerance = 0.001
+
+[prod.rsa_max_radius]
+f10 = 0.45
+f20 = 0.45
+f30 = 0.40
+f40 = 0.20
+f50 = 0.15
+f60 = 0.075
+f70 = 0.05
+f80 = 0.05
+f90 = 0.05
+
+[prod.kai_base]
+init_smoothing_radius = 0.02
+init_contrast = 0.5
+density_filter_radius = 0.005
+projection_beta_init = 16.0
+projection_beta_max = 64.0
+projection_beta_every = 20
+projection_eta = 0.5
+gradient_smoothing_radius = 0.0
+weight_BW_init = 0.5
+weight_update_alpha = 0.99
+weight_update_beta = 1.3
+maxiter = 300
+tolerance = 0.001
+weight_D = 0.0
+
+# Per-fraction choices (scripts/S1_select_params.jl, rules in its header; OQ-32).
+[prod.ckai]
+[prod.ckai.f10]  # revised 2026-10-09 (Robin, OQ-56): l0 = 0.03, r_f = 0.005 (S8 C-Kai); other keys unchanged; previous: [prod.ckai_previous.f10]
+init_smoothing_radius = 0.03
+density_filter_radius = 0.005
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+[prod.ckai.f20]  # 2026-10-09 (Robin, OQ-56): tried l0 = 0.02, r_f = 0.0075 (5 runs kept in results/S1: two outcomes over seeds, kappa/HS+ 63-84 %); reverted to the previous recipe ([prod.ckai_previous.f20], identical)
+init_smoothing_radius = 0.02
+density_filter_radius = 0.005
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "8d1908ec651f"   # results/S1p/8d1908ec651f (seed 1): the one-seed S1 result
+[prod.ckai.f30]  # revised 2026-10-09 (Robin, OQ-56): l0 = 0.03, r_f = 0.0075 (S8 C-Kai); other keys unchanged; previous: [prod.ckai_previous.f30]
+init_smoothing_radius = 0.03
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+[prod.ckai.f40]  # from results/S1p/98405050ff1a: kappa=15.701, r_cov=0.082 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "98405050ff1a"   # results/S1p/98405050ff1a (seed 1): the one-seed S1 result
+[prod.ckai.f50]  # from results/S1p/c1f1b0dbfe06: kappa=21.805, r_cov=0.082 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.01
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "c1f1b0dbfe06"   # results/S1p/c1f1b0dbfe06 (seed 1): the one-seed S1 result
+[prod.ckai.f60]  # from results/S1p/c11ec034195c: kappa=29.08, r_cov=0.066 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "c11ec034195c"   # results/S1p/c11ec034195c (seed 1): the one-seed S1 result
+[prod.ckai.f70]  # from results/S1p/23c2795430e8: kappa=37.912, r_cov=0.066 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.01
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "23c2795430e8"   # results/S1p/23c2795430e8 (seed 1): the one-seed S1 result
+[prod.ckai.f80]  # from results/S1p/31bf33ee32bb: kappa=49.194, r_cov=0.066 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.01
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "31bf33ee32bb"   # results/S1p/31bf33ee32bb (seed 1): the one-seed S1 result
+[prod.ckai.f90]  # from results/S1p/7043efe78dbb: kappa=63.508, r_cov=0.074 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.01
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "7043efe78dbb"   # results/S1p/7043efe78dbb (seed 1): the one-seed S1 result
+[prod.okai]
+[prod.okai.f10]  # revised 2026-10-07 (Robin, OQ-54): l0 = 0.03, r_f = 0.01 (S8); other keys unchanged; previous: [prod.okai_previous.f10]
+init_smoothing_radius = 0.03
+density_filter_radius = 0.01
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 1
+init_contrast = 0.5
+[prod.okai.f20]  # revised 2026-10-07 (Robin, OQ-54): l0 = 0.03, r_f = 0.01 (S8); other keys unchanged; previous: [prod.okai_previous.f20]
+init_smoothing_radius = 0.03
+density_filter_radius = 0.01
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 1
+init_contrast = 0.5
+[prod.okai.f30]  # revised 2026-10-07 (Robin, OQ-54): l0 = 0.03, r_f = 0.01 (S8); other keys unchanged; previous: [prod.okai_previous.f30]
+init_smoothing_radius = 0.03
+density_filter_radius = 0.01
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0.5
+init_contrast = 0.5
+[prod.okai.f40]  # from results/S1p/165d1bf16875: kappa=11.792, r_cov=0.07 
+init_smoothing_radius = 0.03
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0.5
+init_contrast = 0.5
+tuning_run = "165d1bf16875"   # results/S1p/165d1bf16875 (seed 1): the one-seed S1 result
+[prod.okai.f50]  # from results/S1p/e98326bff0c6: kappa=18.719, r_cov=0.078 
+init_smoothing_radius = 0.03
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0.25
+init_contrast = 0.5
+tuning_run = "e98326bff0c6"   # results/S1p/e98326bff0c6 (seed 1): the one-seed S1 result
+[prod.okai.f60]  # from results/S1p/fdf9766e9df0: kappa=25.249, r_cov=0.066 
+init_smoothing_radius = 0.03
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0.25
+init_contrast = 0.5
+tuning_run = "fdf9766e9df0"   # results/S1p/fdf9766e9df0 (seed 1): the one-seed S1 result
+[prod.okai.f70]  # from results/S1p/cb1d194cda01: kappa=33.465, r_cov=0.074 
+init_smoothing_radius = 0.03
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0.25
+init_contrast = 0.5
+tuning_run = "cb1d194cda01"   # results/S1p/cb1d194cda01 (seed 1): the one-seed S1 result
+[prod.okai.f80]  # from results/S1p/411c42c1d7de: kappa=45.391, r_cov=0.074 
+init_smoothing_radius = 0.03
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0.25
+init_contrast = 0.5
+tuning_run = "411c42c1d7de"   # results/S1p/411c42c1d7de (seed 1): the one-seed S1 result
+[prod.okai.f90]  # from results/S1p/9a835ae914b9: kappa=60.998, r_cov=0.082 
+init_smoothing_radius = 0.03
+density_filter_radius = 0.0075
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0.25
+init_contrast = 0.5
+tuning_run = "9a835ae914b9"   # results/S1p/9a835ae914b9 (seed 1): the one-seed S1 result
+
+# O-Kai recipe at f = 0.1-0.3 before the 2026-10-07 revision (OQ-54); its S1 runs stay in results/S1 and are
+# excluded from the benchmark by the parameter match (s1_in_force in src/common.jl).
+[prod.okai_previous]
+[prod.okai_previous.f10]  # from results/S1p/609b303a4c87: kappa=1.908, r_cov=0.09 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.005
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 1
+init_contrast = 0.5
+tuning_run = "609b303a4c87"   # results/S1p/609b303a4c87 (seed 1): the one-seed S1 result
+[prod.okai_previous.f20]  # from results/S1p/9c9abf3e8bd0: kappa=4.233, r_cov=0.082 
+init_smoothing_radius = 0.03
+density_filter_radius = 0.005
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 1
+init_contrast = 0.5
+tuning_run = "9c9abf3e8bd0"   # results/S1p/9c9abf3e8bd0 (seed 1): the one-seed S1 result
+[prod.okai_previous.f30]  # from results/S1p/bae90f37b2b7: kappa=7.204, r_cov=0.059 
+init_smoothing_radius = 0.01
+density_filter_radius = 0.005
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0.5
+init_contrast = 0.5
+tuning_run = "bae90f37b2b7"   # results/S1p/bae90f37b2b7 (seed 1): the one-seed S1 result
+
+# C-Kai recipe at f = 0.1-0.3 before the 2026-10-09 revision (OQ-56); its S1 runs stay in results/S1 and are
+# excluded from the benchmark by the parameter match (s1_in_force).
+[prod.ckai_previous]
+[prod.ckai_previous.f10]  # from results/S1p/b6573c5c32ca: kappa=2.309, r_cov=0.094 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.005
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "b6573c5c32ca"   # results/S1p/b6573c5c32ca (seed 1): the one-seed S1 result
+[prod.ckai_previous.f20]  # from results/S1p/8d1908ec651f: kappa=5.733, r_cov=0.07 
+init_smoothing_radius = 0.02
+density_filter_radius = 0.005
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "8d1908ec651f"   # results/S1p/8d1908ec651f (seed 1): the one-seed S1 result
+[prod.ckai_previous.f30]  # from results/S1p/e2c440842ae4: kappa=10.607, r_cov=0.098 
+init_smoothing_radius = 0.03
+density_filter_radius = 0.005
+projection_beta_init = 16
+weight_BW_init = 0.5
+weight_D = 0
+init_contrast = 0.5
+tuning_run = "e2c440842ae4"   # results/S1p/e2c440842ae4 (seed 1): the one-seed S1 result

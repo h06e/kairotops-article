@@ -1,0 +1,67 @@
+# S6 -- detailed optimization example for the supplementary material (v2 SI
+# sec. 3.1 "Detailed example", replaces Fig. S2 convergence_chi_compressed.pdf).
+# Robin, 2026-09-30: one seed, the method in force (contrast 1000, corrected
+# gradient, revised algorithm docs/algorithm/ckai_algorithm.pdf, N = 256).
+#
+# Case: the S1 O-Kai at f = 0.3 (stiffness Voigt target + open-diffusion
+# target, w_K = 0.5), i.e. the same case as the v1 example (f = 0.3,
+# w_K = 0.5), with the S1 shared settings [prod.kai_base] and the S1 selected
+# parameters [prod.okai.f30] (l0 = 0.01, r_f = 0.005 -> r_cov ~ 0.06). The
+# script checks at start that these values still equal configs/S1.toml.
+# Seed 1 = the S1 production seed-1 run in force (determinism check: the final field should reproduce it;
+# before OQ-54 results/S1/feba488635e9, now the run with l0 = 0.03, r_f = 0.01).
+#
+# Only difference with S1: the history is recorded at EVERY iteration
+# (history_every = 1, microstructure + line-search trials), so that slices,
+# cost terms, beta, w_Bin, greyness, r_cov and the properties of the
+# thresholded field can be followed iteration by iteration.
+
+study_id = "S6"
+
+[prod]
+N = 256
+fraction = 0.3
+seed = 1
+family = "O-Kai"
+history_every = 1
+phase_contrast = 1000
+# S1 [prod.kai_base]
+projection_beta_max = 64.0
+projection_beta_every = 20
+projection_eta = 0.5
+gradient_smoothing_radius = 0.0
+weight_update_alpha = 0.99
+weight_update_beta = 1.3
+maxiter = 300
+tolerance = 0.001
+# S1 [prod.okai.f30], revised 2026-10-07 (OQ-54): l0 = 0.03, r_f = 0.01 (previously 0.01 / 0.005, tuning run
+# results/S1p/bae90f37b2b7; that example stays in results/S6 and is no longer selected)
+init_smoothing_radius = 0.03
+density_filter_radius = 0.01
+projection_beta_init = 16.0
+weight_BW_init = 0.5
+weight_D = 0.5
+init_contrast = 0.5
+
+# Smoke test of the full chain only (plumbing, not physics): N = 64, few iterations.
+[dev]
+N = 64
+fraction = 0.3
+seed = 1
+family = "O-Kai"
+history_every = 1
+phase_contrast = 1000
+projection_beta_max = 64.0
+projection_beta_every = 4   # dev only: exercise the beta doubling within 12 iterations
+projection_eta = 0.5
+gradient_smoothing_radius = 0.0
+weight_update_alpha = 0.99
+weight_update_beta = 1.3
+maxiter = 12
+tolerance = 0.001
+init_smoothing_radius = 0.03
+density_filter_radius = 0.01
+projection_beta_init = 16.0
+weight_BW_init = 0.5
+weight_D = 0.5
+init_contrast = 0.5

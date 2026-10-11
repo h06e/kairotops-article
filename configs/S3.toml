@@ -1,0 +1,49 @@
+# S3 -- anisotropic objectives (Fig. 4 / Sec. 2.3; R2.4, R2.8), method in force
+# (Robin, 2026-09-29: "start S3 with the new recipe, adapt the parameters"):
+# contrast 1000, corrected gradient, revised algorithm (docs/algorithm/ckai_algorithm.pdf),
+# N = 256, shared settings of configs/S1.toml [prod.kai_base].
+#
+# Cases (same target structure as the published ones, Supplementary Sec. 3):
+#   D  isotropic stiffness at 0.3 x Voigt; uniaxial diffusion along e3
+#      (K_33 = D_void, K_11 = K_22 = 0 penalized, off-diagonals free: the mask
+#      of the generating code, OQ-5)
+#   E  uniaxial stiffness: L_1111 = Voigt, L_2222 = L_3333 = Voigt / 8, all other
+#      components free; isotropic diffusion 0.6 x D_void
+#   F  stiffness 0.2 x Voigt with L_3333 / 10 (all components penalized);
+#      diffusion channel rotated by +30 deg about e2, K = D_void R M R^T,
+#      M = diag(0,0,1) (the corrected rotation of OQ-6; the as-coded variant
+#      of the old audit is not repeated)
+# Internal length: l0 = 0.03, r_f = l0 / 4 = 0.0075 (S2: best compromise
+# range, proportional filter).
+# Diffusion weight: re-tuned for the new method on seed 1 (study S3p) over
+# the scan below; scripts/S3_select_weights.jl picks, per case, the weight
+# minimizing J_L + J_K and writes [prod.weight_D]. Production: 3 seeds.
+# Part C (sweep, study S3_sweep): case E x f x l0 (r_f = l0/4) x 3 seeds with
+# case E's selected weight.
+
+study_id = "S3"
+
+[dev]
+N = 64
+fraction = 0.3
+
+[prod]
+N = 256
+phase_contrast = 1000
+fraction = 0.3
+init_smoothing_radius = 0.03
+density_filter_radius = 0.0075
+seeds = [1, 2, 3]
+sweep_fractions = [0.2, 0.3, 0.4]
+sweep_l0 = [0.02, 0.03, 0.05]
+
+[prod.weight_scan]
+D = [0.1, 0.3, 1.0]
+E = [1.0, 3.0, 7.0]
+F = [0.3, 1.0, 3.0]
+
+# Selected weights: written by scripts/S3_select_weights.jl (OQ-33).
+[prod.weight_D]
+D = 1.0
+E = 1.0
+F = 3.0

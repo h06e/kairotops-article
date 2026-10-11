@@ -1,0 +1,92 @@
+# S4 -- robustness to material and geometrical defects, method in force (OQ-41).
+# Robin, 2026-10-01: "Run the S4 study with the new method ... Pick the CKai and OKai
+# of S1 and investigate the material and geometrical defect effect on the effective
+# stiffness. Compare with the RSA and gyroid (also from S1). Normalize the defect with
+# respect to the covariance range of the microstructure."
+#
+# Structures: every S1 production structure at f = 0.3 (contrast 1000, Kairotop 3633967):
+# C-Kai, O-Kai and RSA (canonical r_max = 0.40) seeds 1-5, gyroid. Their own S1 r_cov
+# (covariance range of the thresholded field, stored in results/S1) sets the defect scales.
+#
+# Geometric defect (SI): chi_dist(x) = chi(x + delta(x)), delta a periodic smooth Gaussian
+# vector field, correlation length l_delta = geometric_length_factor * r_cov, peak
+# amplitude a_delta = geometric_amplitude_factor * r_cov (Kairotop.geometric_distortion_field,
+# apply_geometric_defect: nearest-voxel lookup).
+# Material defect (SI): the solid's Young's modulus is multiplied by e(x) in
+# [1 - material_amplitude, 1] (Kairotop.material_defect_field, correlation length
+# l_m = material_length_factor * r_cov), the void untouched. Applied through the existing
+# linear mixture rule: in solid voxels chi = (e - eps) / (1 - eps), eps = E_void / E_solid,
+# gives exactly C = e * C_solid (same Poisson ratio in both phases) -- OQ-41; no new solver.
+#
+# Realization r uses defect seed 1000 * r (same seeds for every structure).
+
+study_id = "S4"
+
+[prod]
+N = 256
+phase_contrast = 1000
+fraction = 0.3
+families = ["C-Kai", "O-Kai", "RSA", "Gyroid"]
+seeds = [1, 2, 3, 4, 5]                 # gyroid: deterministic, one structure
+rsa_max_radius = 0.40                    # canonical S1 RSA protocol at f = 0.3
+n_realizations = 10
+geometric_length_factor = 0.5            # l_delta / r_cov (SI)
+geometric_amplitude_factor = 0.2         # a_delta / r_cov (SI)
+material_length_factor = 0.5             # l_m / r_cov (SI)
+material_amplitude = 0.1                 # E_solid varies in [0.9, 1] x nominal (SI)
+
+# amplitude sweep on seed 1 of each family (same lengths, same realizations count)
+[prod.sweep]
+seeds = [1]
+geometric_amplitude_factors = [0.05, 0.1, 0.4]
+material_amplitudes = [0.05, 0.2]
+
+# fraction-preserving geometric defect (OQ-42, Kairotop.apply_geometric_defect_smooth): binary
+# field smoothed by G_r (r ~ 1 voxel), warped by trilinear interpolation, re-binarized by H_beta
+# (beta -> infinity) with the threshold restoring the exact solid fraction; compared with the
+# same pipeline at delta = 0. l_delta sweep at a_delta = 0.2 r_cov, a_delta sweep at l = 0.5 r_cov
+# (seed 1); the SI point (l = 0.5, a = 0.2) on every structure. Material: 10 % only (linear problem).
+[prod.smooth]
+smoothing_radius = 0.004              # ~1 voxel at N = 256
+length_factors = [0.25, 0.5, 1.0, 1.5]
+amplitude_factors = [0.05, 0.1, 0.2, 0.4]
+
+# Article configuration (OQ-44, Robin 2026-10-02: "the configuration where the kairotops drop less in
+# performance and variability compared to the RSA and gyroids"): fraction-preserving geometric
+# defect with l_delta = 1.5 r_cov (a_delta = 0.2 r_cov), chosen after the l_delta sweep (seed 1),
+# extended to seeds 2-5. Material: the 10 % protocol above.
+[prod.best]
+length_factor = 1.5
+
+# smoke test of the chain only: S1 structures subsampled to 64^3 (every 4th voxel),
+# 2 realizations, stored under S4_smoke as dev runs
+[dev]
+N = 64
+phase_contrast = 1000
+fraction = 0.3
+families = ["C-Kai", "O-Kai", "RSA", "Gyroid"]
+seeds = [1]
+rsa_max_radius = 0.40
+n_realizations = 2
+geometric_length_factor = 0.5
+geometric_amplitude_factor = 0.2
+material_length_factor = 0.5
+material_amplitude = 0.1
+
+[dev.sweep]
+seeds = [1]
+geometric_amplitude_factors = [0.4]
+material_amplitudes = [0.2]
+
+# fraction-preserving geometric defect (OQ-42, Kairotop.apply_geometric_defect_smooth): binary
+# field smoothed by G_r (r ~ 1 voxel), warped by trilinear interpolation, re-binarized by H_beta
+# (beta -> infinity) with the threshold restoring the exact solid fraction; compared with the
+# same pipeline at delta = 0. l_delta sweep at a_delta = 0.2 r_cov, a_delta sweep at l = 0.5 r_cov
+# (seed 1); the SI point (l = 0.5, a = 0.2) on every structure. Material: 10 % only (linear problem).
+[dev.smooth]
+smoothing_radius = 0.016              # ~1 voxel at N = 64
+length_factors = [0.25, 0.5, 1.0, 1.5]
+amplitude_factors = [0.05, 0.1, 0.2, 0.4]
+
+[dev.best]
+length_factor = 1.5

@@ -14,6 +14,14 @@ authors:
     orcid: "https://orcid.org/0009-0005-3626-0386"
     affiliation: "Laboratoire de Mécanique et d'Acoustique, CNRS"
     email: valmalette@lma.cnrs-mrs.fr
+doi: "10.5281/zenodo.23300433"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23300433"
+    description: "Concept DOI (all versions)"
+  - type: doi
+    value: "10.5281/zenodo.23300434"
+    description: "Version 1.0.0"
 repository-code: "https://github.com/h06e/kairotops-article"
 license: BSD-3-Clause
 version: "1.0.0"
@@ -25,6 +33,7 @@ references:
     authors:
       - given-names: Robin
         family-names: Valmalette
+    doi: "10.5281/zenodo.23300432"
     repository-code: "https://github.com/h06e/Kairotop.jl"
 preferred-citation:
   type: article
